@@ -2,8 +2,8 @@
 
 Almate is an interpretation of how the alma (SIS) native android app should look, built with [Jetpack Compose][compose].
 
-To try out this app, use the latest stable version
-of [Android Studio](https://developer.android.com/studio).
+To try out this app, either download it, or use the latest stable version
+of [Android Studio](https://developer.android.com/studio) to compile it.
 You can clone this repository or import the
 project from Android Studio following the steps
 [here](https://developer.android.com/jetpack/compose/setup#sample).
