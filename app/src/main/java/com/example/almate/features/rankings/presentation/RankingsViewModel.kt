@@ -6,9 +6,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.almate.data.model.SupabaseUser
+import com.example.almate.data.repository.UserPreferencesRepository
 import com.example.almate.domain.model.Credentials
 import com.example.almate.domain.repository.SupabaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
@@ -21,7 +24,8 @@ sealed interface LeaderboardState {
 
 @HiltViewModel
 class RankingsViewModel @Inject constructor(
-    private val supabaseRepository: SupabaseRepository
+    private val supabaseRepository: SupabaseRepository,
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
     var leaderboardState: LeaderboardState by mutableStateOf(LeaderboardState.Loading)
@@ -44,6 +48,12 @@ class RankingsViewModel @Inject constructor(
                 leaderboardState = LeaderboardState.Error
             }
         }
+    }
+
+    suspend fun fetchCredentials(): Credentials {
+        return viewModelScope.async {
+            userPreferencesRepository.credentialsFlow.first()
+        }.await()
     }
 
 }

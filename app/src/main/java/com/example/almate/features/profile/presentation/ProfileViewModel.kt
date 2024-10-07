@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.almate.data.model.SupabaseUser
 import com.example.almate.data.repository.UserPreferencesRepository
+import com.example.almate.domain.model.Credentials
 import com.example.almate.domain.repository.AlmaRepository
 import com.example.almate.domain.repository.SupabaseRepository
 import com.example.almate.features.profile.data.GetAttendancesResponse
@@ -38,6 +39,8 @@ class ProfileViewModel @Inject constructor(
     var supabaseUser: SupabaseUser? by mutableStateOf(null)
     var personalInfo: GetPersonalInfoResponse? by mutableStateOf(null)
     var attendances: GetAttendancesResponse? by mutableStateOf(null)
+
+    var creds: Credentials? by mutableStateOf(null)
 
     init {
         fetchData()
@@ -75,6 +78,12 @@ class ProfileViewModel @Inject constructor(
             val credentials = userPreferencesRepository.credentialsFlow.first()
             supabaseRepository.updateUserProfilePicture(credentials.username, profilePictureUrl)
         }
+    }
+
+    suspend fun fetchCredentials(): Credentials {
+        return viewModelScope.async {
+            userPreferencesRepository.credentialsFlow.first()
+        }.await()
     }
 
     fun logout(removeFromDB: Boolean) {

@@ -35,6 +35,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,6 +72,12 @@ fun ProfileScreen(
     onLogOutNavigate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    LaunchedEffect(Unit) {
+        if (profileViewModel.fetchCredentials() != profileViewModel.creds) {
+            profileViewModel.creds = profileViewModel.fetchCredentials()
+            profileViewModel.fetchData()
+        }
+    }
     Scaffold(
         topBar = {
             ProfileTopAppBar()
@@ -232,6 +239,7 @@ fun GeneralInfo(
                 color = Color.White.copy(0.1f)
             )
             Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 InfoRow(
@@ -244,11 +252,13 @@ fun GeneralInfo(
                             modifier = Modifier.alpha(0.67f)
                         )
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
                 )
                 VerticalDivider(
                     thickness = 1.dp,
-                    modifier = Modifier.padding(horizontal = 6.dp),
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                     color = Color.White.copy(0.1f)
                 )
                 InfoRow(
@@ -261,7 +271,9 @@ fun GeneralInfo(
                             modifier = Modifier.alpha(0.67f)
                         )
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
                 )
             }
         }

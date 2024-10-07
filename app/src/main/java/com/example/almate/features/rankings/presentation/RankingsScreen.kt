@@ -29,6 +29,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -60,6 +61,12 @@ fun RankingsScreen(
     scrollState: ScrollState = rememberScrollState(),
     modifier: Modifier = Modifier
 ) {
+    LaunchedEffect(Unit) {
+        if (rankingsViewModel.fetchCredentials() != rankingsViewModel.creds) {
+            rankingsViewModel.creds = rankingsViewModel.fetchCredentials()
+            rankingsViewModel.fetchUsers()
+        }
+    }
     Scaffold(
         topBar = {
             Column {

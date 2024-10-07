@@ -17,7 +17,7 @@ Features to come:
 * AI grade predictor
 
 ## Screenshots
-<img src="Screenshots/home.png" alt="home" height="600px" /> <img src="Screenshots/rankings.png" alt="rankings.png" height="600px" />
+<img src="screenshots/home.png" alt="home" height="600px" /> <img src="screenshots/rankings.png" alt="rankings.png" height="600px" />
 
 ## License
 This project is under no license. Please feel free to message me at @smattsil on IG if you have any problems or legal issues you would like to address.
