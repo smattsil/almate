@@ -1,7 +1,9 @@
-<img src="screenshots/almate.png" alt="almate logo" height="120px" />
-<a href="https://stats.uptimerobot.com/0HCIzTy1EG/">
-  <img src="https://img.shields.io/uptimerobot/status/m797562430-1dd4c1addad4402b1e688c4d" alt="UptimeRobot Badge">
-</a>
+<div style="text-align: center;">
+  <img src="screenshots/almate.png" alt="almate logo" height="36px" />
+  <a href="https://stats.uptimerobot.com/0HCIzTy1EG/">
+    <img src="https://img.shields.io/uptimerobot/status/m797562430-1dd4c1addad4402b1e688c4d" alt="UptimeRobot Badge">
+  </a>
+</div>
 
 # Almate
 
