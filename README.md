@@ -1,7 +1,8 @@
-<img src="screenshots/almate.png" alt="almate logo" height="400px" />
+<img src="screenshots/almate.png" alt="almate logo" height="120px" />
 <a href="https://stats.uptimerobot.com/0HCIzTy1EG/">
   <img src="https://img.shields.io/uptimerobot/status/m797562430-1dd4c1addad4402b1e688c4d" alt="UptimeRobot Badge">
 </a>
+
 # Almate
 
 Almate is an unofficial interpretation of how the alma (SIS) native android app should look, built with [Jetpack Compose][compose]. It works by web scraping the alma website, using a user's credentials. User credentials are NOT stored on any database that belongs to Almate, but rather on users' devices locally.
