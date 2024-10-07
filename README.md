@@ -30,6 +30,22 @@ Features to come:
 ## Screenshots
 <img src="screenshots/home.png" alt="home" height="600px" /> <img src="screenshots/rankings.png" alt="rankings" height="600px" /> <img src="screenshots/profile.png" alt="profile" height="600px" />
 
+## Libraries
+Here are a list of the libraries/technologies that I used (including for the API):
+
+Kotlin
+- Retrofit (for API requests)
+- Hilt (for dependency injection)
+- Coil (for loading images from the internet)
+- Ktor (for the supabase database)
+- Shimmer (for the shimmer effect)
+
+Python
+- Render (to host the API)
+- FastAPI (to make the api)
+- asyncio (for asynchronous programming)
+- aiohttp + selectolax (for web scraping the website)
+
 ## License
 This project is under no license. Please feel free to message me at @smattsil on IG if you have any problems or legal issues you would like to address.
 
