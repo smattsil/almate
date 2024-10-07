@@ -3,6 +3,8 @@ package com.example.almate.features.home.presentation
 import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +25,7 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,10 +42,12 @@ import coil.request.ImageRequest
 import com.example.almate.R
 import com.example.almate.features.home.data.model.GetSubjectResponse
 import com.example.almate.features.home.presentation.components.HomeScreen
+import com.example.almate.features.home.presentation.components.HomeState
 import com.example.almate.features.home.presentation.components.HomeViewModel
 import com.example.almate.features.home.presentation.components.SubjectScreen
 import com.example.almate.features.home.presentation.components.SubjectViewModel
 import com.example.almate.presentation.theme.proximaNovaFamily
+import kotlinx.coroutines.delay
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -90,7 +95,9 @@ fun HomeListDetailScreen(
                                 content = subject
                             )
                         },
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .animateContentSize()
                     )
                 }
             },
@@ -101,14 +108,17 @@ fun HomeListDetailScreen(
                             SubjectScreen(
                                 subject = subject as Subject,
                                 subjectViewModel = subjectViewModel,
-                                navigateBack = { navigator.navigateBack() },
-                                modifier = Modifier.padding(innerPadding)
+                                modifier = Modifier
+                                    .padding(innerPadding)
+                                    .animateContentSize()
                             )
                         }
                     }
                 } else {
-                    AnimatedPane {
-                        SubjectPlaceholderScreen()
+                    if (homeViewModel.homeState == HomeState.Success) {
+                        AnimatedPane {
+                            SubjectPlaceholderScreen()
+                        }
                     }
                 }
             },

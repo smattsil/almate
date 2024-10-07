@@ -31,6 +31,6 @@ Features to come:
 <img src="screenshots/home.png" alt="home" height="600px" /> <img src="screenshots/rankings.png" alt="rankings" height="600px" /> <img src="screenshots/profile.png" alt="profile" height="600px" />
 
 ## License
-⚠️ This project is under no license. Please feel free to message me at @smattsil on IG if you have any problems or legal issues you would like to address. ⚠️
+This project is under no license. Please feel free to message me at @smattsil on IG if you have any problems or legal issues you would like to address.
 
 [compose]: https://developer.android.com/jetpack/compose

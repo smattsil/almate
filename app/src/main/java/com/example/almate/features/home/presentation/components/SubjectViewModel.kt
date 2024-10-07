@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.almate.data.repository.UserPreferencesRepository
 import com.example.almate.domain.repository.AlmaRepository
+import com.example.almate.features.home.data.model.GetGradesResponseItem
 import com.example.almate.features.home.data.model.GetSubjectResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
@@ -19,7 +20,7 @@ sealed interface SubjectState {
     object Error : SubjectState
 }
 
-enum class SortType {
+enum class AssignmentSortType {
     ALPHABET, CATEGORY, PERCENT, DATE
 }
 
@@ -32,6 +33,8 @@ class SubjectViewModel @Inject constructor(
     var path: String? by mutableStateOf(null)
     var subjectState: SubjectState by mutableStateOf(SubjectState.Loading)
     var subjectResponse: GetSubjectResponse by mutableStateOf(GetSubjectResponse(emptyList(), emptyList(), "", "", "", ""))
+    var sortType: AssignmentSortType by mutableStateOf(AssignmentSortType.ALPHABET)
+    var showSortBottomSheet: Boolean by mutableStateOf(false)
 
     init {
         if (path != null) {
@@ -44,15 +47,10 @@ class SubjectViewModel @Inject constructor(
             subjectState = SubjectState.Loading
             clearSubjectResponse()
             try {
-
                 val credentials = userPreferencesRepository.credentialsFlow.first()
-                println("POOP: got creds")
-
-                subjectResponse = almaRepository.getSubject(credentials, path)
-                println("POOP: got resp")
-
+                val response = almaRepository.getSubject(credentials, path)
+                subjectResponse = response.copy(assignments = response.assignments.sortedByDescending { it.name })
                 subjectState = SubjectState.Success
-
             } catch (e: Exception) {
                 subjectState = SubjectState.Error
             }
@@ -61,6 +59,27 @@ class SubjectViewModel @Inject constructor(
 
     fun clearSubjectResponse() {
         subjectResponse = GetSubjectResponse(emptyList(), emptyList(), "", "", "", "")
+    }
+
+    fun sortBy(type: AssignmentSortType) {
+        subjectResponse = when (type) {
+            AssignmentSortType.ALPHABET -> {
+                sortType = AssignmentSortType.ALPHABET
+                subjectResponse.copy(assignments = subjectResponse.assignments.sortedByDescending { it.name })
+            }
+            AssignmentSortType.CATEGORY -> {
+                sortType = AssignmentSortType.CATEGORY
+                subjectResponse.copy(assignments = subjectResponse.assignments.sortedByDescending { it.category })
+            }
+            AssignmentSortType.PERCENT -> {
+                sortType = AssignmentSortType.PERCENT
+                subjectResponse.copy(assignments = subjectResponse.assignments.sortedByDescending { it.percent })
+            }
+            AssignmentSortType.DATE -> {
+                sortType = AssignmentSortType.DATE
+                subjectResponse.copy(assignments = subjectResponse.assignments.sortedByDescending { it.date })
+            }
+        }
     }
 
 }

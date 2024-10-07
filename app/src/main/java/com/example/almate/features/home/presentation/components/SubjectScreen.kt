@@ -1,9 +1,9 @@
 package com.example.almate.features.home.presentation.components
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +20,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,23 +45,26 @@ import com.example.almate.features.home.data.model.GetSubjectResponse
 import com.example.almate.features.home.presentation.Subject
 import com.example.almate.features.home.presentation.SubjectSkeletonScreen
 import com.example.almate.presentation.ErrorScreen
-import com.example.almate.presentation.SmallLoadingScreen
 import com.example.almate.presentation.theme.cardBackgroundColor
 
 @Composable
 fun SubjectScreen(
     subject: Subject,
-    navigateBack: () -> Unit,
     subjectViewModel: SubjectViewModel = hiltViewModel(),
     scrollState: ScrollState = rememberScrollState(),
     modifier: Modifier = Modifier
 ) {
-
     LaunchedEffect(subject.path) {
         subjectViewModel.fetchData(subject.path)
         scrollState.scrollTo(0)
     }
-
+    if (subjectViewModel.showSortBottomSheet) {
+        SortAssignmentBottomSheet(
+            onDismissRequest = { subjectViewModel.showSortBottomSheet = false },
+            onSortSelection = { subjectViewModel.sortBy(it) },
+            sortType = subjectViewModel.sortType
+        )
+    }
     when (subjectViewModel.subjectState) {
         is SubjectState.Loading -> SubjectSkeletonScreen(modifier = modifier)
         is SubjectState.Success ->
@@ -70,11 +76,14 @@ fun SubjectScreen(
             ) {
                 OverallGrade(subjectViewModel.subjectResponse)
                 Spacer(Modifier.height(24.dp))
-                Assignments(subjectViewModel.subjectResponse.assignments)
+                Assignments(
+                    assignments = subjectViewModel.subjectResponse.assignments,
+                    onSortClick = { subjectViewModel.showSortBottomSheet = true },
+                    sortType = subjectViewModel.sortType
+                )
             }
         is SubjectState.Error -> ErrorScreen(onClick = { subjectViewModel.fetchData(subject.path) })
     }
-
 }
 
 @Composable
@@ -160,8 +169,8 @@ fun OverallGrade(
 @Composable
 fun Assignments(
     assignments: List<Assignment>,
-//    onSwitchSort: (SortType) -> Unit,
-//    sortType: SortType,
+    onSortClick: () -> Unit,
+    sortType: AssignmentSortType,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -180,7 +189,7 @@ fun Assignments(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
-//                    .clickable { onSwitchSort() }
+                    .clickable { onSortClick() }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -188,13 +197,7 @@ fun Assignments(
                         .alpha(0.67f)
                 ) {
                     Text(
-                        text = "Alphabet",
-//                        when (sortType) {
-//                            SortType.ALPHABET -> "Alphabet"
-//                            SortType.PERCENT -> "PERCENT"
-//                            SortType.CATEGORY -> "Category"
-//                            SortType.DATE -> "Date"
-//                        },
+                        text = sortType.toString().titleCase(),
                         fontSize = 16.sp
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -261,11 +264,63 @@ fun Assignment(
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
-            Text(
-                text = if (assignment.date == "-") "" else assignment.date,
-                fontSize = 12.sp,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.alpha(0.67f)
-            )
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.update_24dp_e8eaed_fill1_wght400_grad0_opsz24),
+                    contentDescription = null,
+                    modifier = Modifier.size(12.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = assignment.date,
+                    fontSize = 12.sp
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SortAssignmentBottomSheet(
+    onDismissRequest: () -> Unit,
+    onSortSelection: (AssignmentSortType) -> Unit,
+    sortType: AssignmentSortType,
+    modifier: Modifier = Modifier
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        containerColor = cardBackgroundColor,
+        modifier = modifier
+    ) {
+        Column {
+            for (type in AssignmentSortType.entries) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .clickable {
+                            onSortSelection(type)
+                            onDismissRequest()
+                        }
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = type.toString().titleCase()
+                    )
+                    RadioButton(
+                        selected = type == sortType,
+                        onClick = {
+                            onSortSelection(type)
+                            onDismissRequest()
+                        }
+                    )
+                }
+            }
         }
     }
 }

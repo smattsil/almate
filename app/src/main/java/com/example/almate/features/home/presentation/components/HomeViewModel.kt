@@ -25,6 +25,10 @@ sealed interface HomeState {
     object Error : HomeState
 }
 
+enum class SubjectSortType {
+    ALPHABET, PERCENTAGE, WEIGHT, TEACHER
+}
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val almaRepository: AlmaRepository,
@@ -37,7 +41,8 @@ class HomeViewModel @Inject constructor(
     var supabaseUser: SupabaseUser by mutableStateOf(SupabaseUser("", "", 0, "", "", ""))
     var gpaResponse: GetGpaResponse by mutableStateOf(GetGpaResponse("", ""))
     var grades: List<GetGradesResponseItem> by mutableStateOf(emptyList())
-    var sortedAlphabetically: Boolean = true
+    var showSortBottomSheet: Boolean by mutableStateOf(false)
+    var sortType: SubjectSortType by mutableStateOf(SubjectSortType.ALPHABET)
 
     var creds: Credentials? by mutableStateOf(null)
 
@@ -74,12 +79,24 @@ class HomeViewModel @Inject constructor(
         }.await()
     }
 
-    fun switchSort() {
-        sortedAlphabetically = !sortedAlphabetically
-        grades = if (sortedAlphabetically) {
-            grades.sortedBy { it.name }
-        } else {
-            sortGradesByPercent(grades)
+    fun sortBy(type: SubjectSortType) {
+        grades = when (type) {
+           SubjectSortType.ALPHABET -> {
+               sortType = SubjectSortType.ALPHABET
+               grades.sortedByDescending { it.name }
+           }
+            SubjectSortType.WEIGHT -> {
+                sortType = SubjectSortType.WEIGHT
+                grades.sortedByDescending { it.weight }
+            }
+            SubjectSortType.PERCENTAGE -> {
+                sortType = SubjectSortType.PERCENTAGE
+                sortGradesByPercent(grades)
+            }
+            SubjectSortType.TEACHER -> {
+                sortType = SubjectSortType.TEACHER
+                grades.sortedByDescending { it.teacher }
+            }
         }
     }
 
@@ -92,4 +109,8 @@ class HomeViewModel @Inject constructor(
         })
     }
 
+}
+
+fun String.titleCase(): String {
+    return this.split(" ").joinToString(" ") { it.lowercase().replaceFirstChar { char -> char.uppercase() } }
 }

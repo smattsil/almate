@@ -22,7 +22,10 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -71,6 +74,13 @@ fun HomeScreen(
             homeViewModel.fetchData()
         }
     }
+    if (homeViewModel.showSortBottomSheet) {
+        SortSubjectBottomSheet(
+            onDismissRequest = { homeViewModel.showSortBottomSheet = false },
+            onSortSelection = { homeViewModel.sortBy(it) },
+            sortType = homeViewModel.sortType
+        )
+    }
     when (homeViewModel.homeState) {
         is HomeState.Loading -> HomeSkeletonScreen(modifier = modifier)
         is HomeState.Success ->
@@ -93,9 +103,9 @@ fun HomeScreen(
                 }
                 Grades(
                     grades = homeViewModel.grades,
-                    onSwitchSort = { homeViewModel.switchSort() },
+                    onSortClick = { homeViewModel.showSortBottomSheet = true },
                     onSubjectClick = { onSubjectClick(it) },
-                    sortedAlphabetically = homeViewModel.sortedAlphabetically
+                    sortType = homeViewModel.sortType
                 )
             }
         is HomeState.Error -> ErrorScreen(onClick = { homeViewModel.fetchData() })
@@ -211,8 +221,8 @@ fun GpaAnalytics(
 
 fun LazyListScope.Grades(
     grades: List<GetGradesResponseItem>,
-    onSwitchSort: () -> Unit,
-    sortedAlphabetically: Boolean,
+    onSortClick: () -> Unit,
+    sortType: SubjectSortType,
     onSubjectClick: (Subject) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -230,7 +240,7 @@ fun LazyListScope.Grades(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
-                    .clickable { onSwitchSort() }
+                    .clickable { onSortClick() }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -238,7 +248,7 @@ fun LazyListScope.Grades(
                         .alpha(0.67f)
                 ) {
                     Text(
-                        text = if (sortedAlphabetically) "Alphabet" else "Percentage",
+                        text = sortType.toString().titleCase(),
                         fontSize = 16.sp
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -358,6 +368,48 @@ fun GradeCard(
                     fontSize = 14.sp,
                     color = Color.White
                 )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SortSubjectBottomSheet(
+    onDismissRequest: () -> Unit,
+    onSortSelection: (SubjectSortType) -> Unit,
+    sortType: SubjectSortType,
+    modifier: Modifier = Modifier
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        containerColor = cardBackgroundColor,
+        modifier = modifier
+    ) {
+        Column {
+            for (type in SubjectSortType.entries) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .clickable {
+                            onSortSelection(type)
+                            onDismissRequest()
+                        }
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = type.toString().titleCase()
+                    )
+                    RadioButton(
+                        selected = type == sortType,
+                        onClick = {
+                            onSortSelection(type)
+                            onDismissRequest()
+                        }
+                    )
+                }
             }
         }
     }
