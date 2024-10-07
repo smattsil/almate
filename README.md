@@ -1,6 +1,6 @@
 # Almate
 
-Almate is an unofficial interpretation of how the alma (SIS) native android app should look, built with [Jetpack Compose][compose]. It works by web scraping the alma website, using a user's credentials. All user credentials are NOT store on any database that belongs to Almate, but rather stored on each device locally.
+Almate is an unofficial interpretation of how the alma (SIS) native android app should look, built with [Jetpack Compose][compose]. It works by web scraping the alma website, using a user's credentials. User credentials are NOT stored on any database that belongs to Almate, but rather on users' devices locally.
 
 To try out this app, either download it, or use the latest stable version
 of [Android Studio](https://developer.android.com/studio) to compile it.
