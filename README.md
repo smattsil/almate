@@ -1,6 +1,6 @@
 # Almate
 
-Almate is an interpretation of how the alma (SIS) native android app should look, built with [Jetpack Compose][compose].
+Almate is an unofficial interpretation of how the alma (SIS) native android app should look, built with [Jetpack Compose][compose].
 
 To try out this app, either download it, or use the latest stable version
 of [Android Studio](https://developer.android.com/studio) to compile it.
