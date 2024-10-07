@@ -1,10 +1,13 @@
-<div style="text-align: center;">
-  <img src="screenshots/almate.png" alt="almate logo" height="36px" />
-  
+<p align="center">
+   <a href="https://github.com/smattsil/almate/releases/download/v1.1.0/app-release.apk">
+      <img src="screenshots/almate.png" alt="almate logo" height="36px" />
+   </a>
+</p>
+<p align="center">
   <a href="https://stats.uptimerobot.com/0HCIzTy1EG/">
     <img src="https://img.shields.io/uptimerobot/status/m797562430-1dd4c1addad4402b1e688c4d" alt="UptimeRobot Badge">
   </a>
-</div>
+</p>
 
 # Almate
 
