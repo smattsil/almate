@@ -10,15 +10,16 @@ project from Android Studio following the steps
 
 Features:
 * GPA calculator
-* Leaderboard
+* Ranking system
 
 Features to come:
-* AI chatbot
+* AI chatbot (with Gemini for Android)
 * AI grade predictor
 
 ## Screenshots
 
-<img src="screenshots/screenshots.png" alt="Almate"/>
+<img src="Screenshots/home.png" alt="home"/>
+<img src="Screenshots/rankings.png" alt="rankings"/>
 
 ## License
 This project is under no license. Please feel free to message me at @smattsil on IG if you have any problems or legal issues you would like to address.
