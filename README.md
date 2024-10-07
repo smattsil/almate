@@ -1,6 +1,6 @@
 <p align="center">
    <a href="https://github.com/smattsil/almate/releases/download/v0.0.2/app-release.apk">
-      <img src="screenshots/almate.png" alt="almate logo" />
+      <img src="screenshots/almatewhite.png" alt="almate logo" />
    </a>
 </p>
 <p align="center">
