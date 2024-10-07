@@ -26,12 +26,13 @@ Features:
 Features to come:
 * AI chatbot (with Gemini for Android)
 * AI grade predictor
+* Final grade calculator
 
 ## Screenshots
 <img src="screenshots/home.png" alt="home" height="600px" /> <img src="screenshots/rankings.png" alt="rankings" height="600px" /> <img src="screenshots/profile.png" alt="profile" height="600px" />
 
 ## Libraries
-Here are a list of the libraries/technologies that I used (including for the API):
+Here are a list of the libraries/technologies that were used (including for the API):
 
 Kotlin
 - Retrofit (for API requests)
@@ -47,6 +48,6 @@ Python
 - aiohttp + selectolax (for web scraping the website)
 
 ## License
-This project is under no license. Please feel free to message me at @smattsil on IG if you have any problems or legal issues you would like to address.
+This project is under no license. Please feel free to message @smattsil on IG if you have any problems or legal issues you would like to address.
 
 [compose]: https://developer.android.com/jetpack/compose
