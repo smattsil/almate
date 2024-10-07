@@ -111,7 +111,7 @@ fun RankingsScreen(
         }
     ) { innerPadding ->
         when (rankingsViewModel.leaderboardState) {
-            is LeaderboardState.Loading -> SmallLoadingScreen()
+            is LeaderboardState.Loading -> RankingsSkeletonScreen(modifier = modifier.padding(innerPadding))
             is LeaderboardState.Success ->
                 Column(
                     modifier = modifier

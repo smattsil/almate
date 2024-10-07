@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.compose.shimmer)
     implementation(libs.androidx.material3.adaptive.navigation.suite.android)
     implementation(libs.androidx.adaptive.navigation.android)
+    implementation(libs.androidx.core.core.splashscreen)
     kapt(libs.androidx.hilt.compiler)
     kapt(libs.hilt.android.compiler.v252)
     testImplementation(libs.junit)

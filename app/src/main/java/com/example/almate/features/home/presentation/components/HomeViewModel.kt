@@ -1,5 +1,6 @@
 package com.example.almate.features.home.presentation.components
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -69,6 +70,27 @@ class HomeViewModel @Inject constructor(
                 homeState = HomeState.Success
             } catch (e: Exception) {
                 homeState = HomeState.Error
+            }
+        }
+    }
+
+    fun silentFetchData() {
+        viewModelScope.launch {
+            try {
+                coroutineScope {
+                    val credentials = userPreferencesRepository.credentialsFlow.first()
+                    async {
+                        supabaseUser = supabaseRepository.getUser(credentials.username)
+                    }
+                    async {
+                        gpaResponse = almaRepository.getGpa(credentials)
+                    }
+                    async {
+                        grades = almaRepository.getGrades(credentials).sortedBy { it.name }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.d("ALMATE", "Failed to silently fetch data.")
             }
         }
     }
