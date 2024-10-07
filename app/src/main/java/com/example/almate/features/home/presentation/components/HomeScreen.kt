@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -71,7 +72,7 @@ fun HomeScreen(
         }
     }
     when (homeViewModel.homeState) {
-        is HomeState.Loading -> HomeSkeletonScreen(modifier = modifier.clipToBounds())
+        is HomeState.Loading -> HomeSkeletonScreen(modifier = modifier)
         is HomeState.Success ->
             LazyColumn(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),

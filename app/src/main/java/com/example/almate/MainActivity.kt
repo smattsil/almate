@@ -18,12 +18,6 @@ import com.example.almate.presentation.theme.AlmateTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
 
-// Main Routes
-//@Serializable data object Loading
-@Serializable data object Auth
-@Serializable data object Main
-@Serializable data object Error
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

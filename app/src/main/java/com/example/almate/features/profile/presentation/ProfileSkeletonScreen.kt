@@ -30,7 +30,7 @@ fun ProfileSkeletonScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(ScrollState(0))
+            .verticalScroll(state = ScrollState(0), enabled = false)
             .padding(horizontal = 16.dp, vertical = 24.dp)
             .shimmer()
     ) {

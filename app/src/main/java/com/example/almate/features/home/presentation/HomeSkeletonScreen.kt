@@ -29,7 +29,7 @@ fun HomeSkeletonScreen(
 ) {
     Column(
         modifier = modifier
-            .verticalScroll(ScrollState(0))
+            .verticalScroll(state = ScrollState(0), enabled = false)
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 24.dp)
             .shimmer()

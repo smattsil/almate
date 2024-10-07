@@ -95,9 +95,9 @@ fun HomeListDetailScreen(
                 }
             },
             detailPane = {
-                AnimatedPane {
-                    if (subjectOpened) {
-                        navigator.currentDestination?.content?.let { subject ->
+                if (subjectOpened) {
+                    navigator.currentDestination?.content?.let { subject ->
+                        AnimatedPane {
                             SubjectScreen(
                                 subject = subject as Subject,
                                 subjectViewModel = subjectViewModel,
@@ -105,7 +105,9 @@ fun HomeListDetailScreen(
                                 modifier = Modifier.padding(innerPadding)
                             )
                         }
-                    } else {
+                    }
+                } else {
+                    AnimatedPane {
                         SubjectPlaceholderScreen()
                     }
                 }

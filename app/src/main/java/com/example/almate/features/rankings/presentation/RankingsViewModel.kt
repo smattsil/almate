@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.almate.data.model.SupabaseUser
+import com.example.almate.domain.model.Credentials
 import com.example.almate.domain.repository.SupabaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -26,6 +27,8 @@ class RankingsViewModel @Inject constructor(
     var leaderboardState: LeaderboardState by mutableStateOf(LeaderboardState.Loading)
 
     var supabaseUsers: List<SupabaseUser> by mutableStateOf(emptyList())
+
+    var creds: Credentials? by mutableStateOf(null)
 
     init {
         fetchUsers()

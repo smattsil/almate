@@ -147,7 +147,18 @@ fun AlmateNavHost(
         }
         composable<Profile> {
             val profileViewModel: ProfileViewModel = hiltViewModel()
-            ProfileScreen(profileViewModel)
+            ProfileScreen(
+                profileViewModel = profileViewModel,
+                onLogOutNavigate = {
+                    navController.navigate(Home) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
         }
     }
 }
