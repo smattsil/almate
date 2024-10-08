@@ -69,7 +69,7 @@ enum class AppDestinations(
 }
 
 @Composable
-fun AlmateApp(
+fun MainApp(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
@@ -109,12 +109,12 @@ fun AlmateApp(
             }
         }
     ) {
-        AlmateNavHost(navController = navController)
+        MainNavigation(navController = navController)
     }
 }
 
 @Composable
-fun AlmateNavHost(
+fun MainNavigation(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {

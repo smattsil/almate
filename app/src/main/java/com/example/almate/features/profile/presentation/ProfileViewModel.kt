@@ -40,8 +40,6 @@ class ProfileViewModel @Inject constructor(
     var personalInfo: GetPersonalInfoResponse? by mutableStateOf(null)
     var attendances: GetAttendancesResponse? by mutableStateOf(null)
 
-    var creds: Credentials? by mutableStateOf(null)
-
     init {
         fetchData()
     }
@@ -78,12 +76,6 @@ class ProfileViewModel @Inject constructor(
             val credentials = userPreferencesRepository.credentialsFlow.first()
             supabaseRepository.updateUserProfilePicture(credentials.username, profilePictureUrl)
         }
-    }
-
-    suspend fun fetchCredentials(): Credentials {
-        return viewModelScope.async {
-            userPreferencesRepository.credentialsFlow.first()
-        }.await()
     }
 
     fun logout(removeFromDB: Boolean) {

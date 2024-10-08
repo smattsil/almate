@@ -13,13 +13,6 @@ import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface AppState {
-    data object Loading : AppState
-    data object Main : AppState
-    data object Auth : AppState
-    data object Error : AppState
-}
-
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
     private val almaRepository: AlmaRepository,
@@ -28,20 +21,17 @@ class MainActivityViewModel @Inject constructor(
 ): ViewModel() {
 
     val credentialsFlow = userPreferencesRepository.credentialsFlow
-    var appState: AppState by mutableStateOf(AppState.Loading)
-    var isLoggedIn: Boolean by mutableStateOf(false)
+    var isLoggedIn: Boolean? by mutableStateOf(null)
 
     init {
         viewModelScope.launch {
             credentialsFlow.collect { credentials ->
-                val isLoggedIn = credentials.username.isNotBlank()
-                if (isLoggedIn) {
+                isLoggedIn = credentials.username.isNotBlank()
+                if (isLoggedIn == true) {
                     val overallInfo = almaRepository.getOverallInfo(credentials)
                     try {
                         supabaseRepository.updateUser(credentials.username, overallInfo)
-                        appState = AppState.Main
                     } catch (e: Exception) {
-                        appState = AppState.Error
                     }
                 }
             }

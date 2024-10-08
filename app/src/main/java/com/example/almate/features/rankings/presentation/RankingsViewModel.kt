@@ -29,10 +29,7 @@ class RankingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     var leaderboardState: LeaderboardState by mutableStateOf(LeaderboardState.Loading)
-
     var supabaseUsers: List<SupabaseUser> by mutableStateOf(emptyList())
-
-    var creds: Credentials? by mutableStateOf(null)
 
     init {
         fetchUsers()
@@ -48,12 +45,6 @@ class RankingsViewModel @Inject constructor(
                 leaderboardState = LeaderboardState.Error
             }
         }
-    }
-
-    suspend fun fetchCredentials(): Credentials {
-        return viewModelScope.async {
-            userPreferencesRepository.credentialsFlow.first()
-        }.await()
     }
 
 }

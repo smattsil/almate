@@ -68,12 +68,6 @@ fun HomeScreen(
     onSubjectClick: (Subject) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LaunchedEffect(Unit) {
-        if (homeViewModel.fetchCredentials() != homeViewModel.creds) {
-            homeViewModel.creds = homeViewModel.fetchCredentials()
-            homeViewModel.fetchData()
-        }
-    }
     if (homeViewModel.showSortBottomSheet) {
         SortSubjectBottomSheet(
             onDismissRequest = { homeViewModel.showSortBottomSheet = false },

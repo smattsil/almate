@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,6 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.almate.features.auth.presentation.LoginScreen
 import com.example.almate.features.tools.presentation.components.MessageTextField
@@ -35,40 +39,55 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val viewModel = hiltViewModel<MainActivityViewModel>()
-            val credentialsFlow = viewModel.credentialsFlow
-            val navController = rememberNavController()
 
             splashScreen.setKeepOnScreenCondition {
-                when (viewModel.appState) {
-                    AppState.Loading -> true
+                when (viewModel.isLoggedIn) {
+                    null -> true
                     else -> false
                 }
             }
 
-            LaunchedEffect(Unit) {
-                credentialsFlow.collect { credentials ->
-                    val isLoggedIn = credentials.username.isNotBlank()
-                    if (isLoggedIn) {
-                        viewModel.appState = AppState.Main
-                    } else {
-                        viewModel.appState = AppState.Auth
-                    }
-                }
-            }
+            AlmateTheme { viewModel.isLoggedIn?.let { AlmateApp(isLoggedIn = it) } }
 
-            AlmateTheme {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize()
-                ) { innerPadding ->
-                    when (viewModel.appState) {
-                        is AppState.Loading -> LoadingScreen(modifier = Modifier.padding(innerPadding))
-                        is AppState.Auth -> LoginScreen(modifier = Modifier.padding(innerPadding))
-                        is AppState.Main -> AlmateApp(navController = navController, modifier = Modifier.padding(innerPadding))
-                        is AppState.Error -> ErrorScreen(onClick = {})
-                    }
-                }
-            }
+        }
+    }
+}
 
+@Serializable data object Auth
+@Serializable data object Main
+
+@Composable
+fun AlmateApp(
+    isLoggedIn: Boolean
+) {
+    Scaffold(
+        modifier = Modifier.fillMaxSize()
+    ) { innerPadding ->
+        val almateNavController = rememberNavController()
+        AlmateNavigation(
+            isLoggedIn = isLoggedIn,
+            navController = almateNavController,
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
+}
+
+@Composable
+fun AlmateNavigation(
+    isLoggedIn: Boolean,
+    navController: NavHostController,
+    modifier: Modifier
+) {
+    NavHost(
+        navController = navController,
+        startDestination = if (isLoggedIn) Main else Auth,
+    ) {
+        composable<Auth> {
+            LoginScreen()
+        }
+        composable<Main> {
+            val mainNavController = rememberNavController()
+            MainApp(mainNavController)
         }
     }
 }

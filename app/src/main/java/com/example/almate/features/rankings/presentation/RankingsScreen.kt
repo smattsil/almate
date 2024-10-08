@@ -61,12 +61,6 @@ fun RankingsScreen(
     scrollState: ScrollState = rememberScrollState(),
     modifier: Modifier = Modifier
 ) {
-    LaunchedEffect(Unit) {
-        if (rankingsViewModel.fetchCredentials() != rankingsViewModel.creds) {
-            rankingsViewModel.creds = rankingsViewModel.fetchCredentials()
-            rankingsViewModel.fetchUsers()
-        }
-    }
     Scaffold(
         topBar = {
             Column {

@@ -45,8 +45,6 @@ class HomeViewModel @Inject constructor(
     var showSortBottomSheet: Boolean by mutableStateOf(false)
     var sortType: SubjectSortType by mutableStateOf(SubjectSortType.ALPHABET)
 
-    var creds: Credentials? by mutableStateOf(null)
-
     init {
         fetchData()
     }
@@ -93,12 +91,6 @@ class HomeViewModel @Inject constructor(
                 Log.d("ALMATE", "Failed to silently fetch data.")
             }
         }
-    }
-
-    suspend fun fetchCredentials(): Credentials {
-        return viewModelScope.async {
-            userPreferencesRepository.credentialsFlow.first()
-        }.await()
     }
 
     fun sortBy(type: SubjectSortType) {

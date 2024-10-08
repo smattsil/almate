@@ -72,12 +72,6 @@ fun ProfileScreen(
     onLogOutNavigate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LaunchedEffect(Unit) {
-        if (profileViewModel.fetchCredentials() != profileViewModel.creds) {
-            profileViewModel.creds = profileViewModel.fetchCredentials()
-            profileViewModel.fetchData()
-        }
-    }
     Scaffold(
         topBar = {
             ProfileTopAppBar()
