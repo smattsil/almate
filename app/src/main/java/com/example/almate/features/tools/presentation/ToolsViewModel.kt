@@ -7,7 +7,8 @@ import javax.inject.Inject
 data class Tool(
     val icon: Int,
     val name: String,
-    val description: String
+    val description: String,
+    val route: Any
 )
 
 @HiltViewModel
