@@ -29,7 +29,7 @@ Features to come:
 * Final grade calculator
 
 ## Screenshots
-<img src="screenshots/home.png" alt="home" height="600px" /> <img src="screenshots/rankings.png" alt="rankings" height="600px" /> <img src="screenshots/profile.png" alt="profile" height="600px" />
+<img src="screenshots/home.png" alt="home screen" height="600px" /> <img src="screenshots/rankings.png" alt="rankings screen" height="600px" /> <img src="screenshots/tools.png" alt="tools screen" height="600px" />
 
 ## Libraries
 Here are a list of the libraries/technologies that were used (including for the API):
