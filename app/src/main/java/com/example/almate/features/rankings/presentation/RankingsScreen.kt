@@ -29,7 +29,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -50,7 +49,6 @@ import coil.request.ImageRequest
 import com.example.almate.R
 import com.example.almate.data.model.SupabaseUser
 import com.example.almate.presentation.ErrorScreen
-import com.example.almate.presentation.SmallLoadingScreen
 import com.example.almate.presentation.theme.cardBackgroundColor
 import com.example.almate.presentation.theme.proximaNovaFamily
 
@@ -106,26 +104,32 @@ fun RankingsScreen(
     ) { innerPadding ->
         when (rankingsViewModel.leaderboardState) {
             is LeaderboardState.Loading -> RankingsSkeletonScreen(modifier = modifier.padding(innerPadding))
-            is LeaderboardState.Success ->
-                Column(
-                    modifier = modifier
-                        .verticalScroll(scrollState)
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp, vertical = 24.dp)
-                        .animateContentSize()
-                        .padding(innerPadding)
-                ) {
-                    SearchBlock(
-                        onClick = { /*TODO: Add search handle.*/ }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    rankingsViewModel.supabaseUsers.forEachIndexed { index, user ->
-                        User(index + 1, user)
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                }
-
+            is LeaderboardState.Success -> RankingsScreen(scrollState, rankingsViewModel, modifier.padding(innerPadding))
             is LeaderboardState.Error -> ErrorScreen(onClick = { rankingsViewModel.fetchUsers() })
+        }
+    }
+}
+
+@Composable
+private fun RankingsScreen(
+    scrollState: ScrollState,
+    rankingsViewModel: RankingsViewModel,
+    modifier: Modifier
+) {
+    Column(
+        modifier = modifier
+            .verticalScroll(scrollState)
+            .fillMaxSize()
+            .padding(horizontal = 16.dp, vertical = 24.dp)
+            .animateContentSize()
+    ) {
+        SearchBlock(
+            onClick = { /*TODO: Add search handle.*/ }
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        rankingsViewModel.supabaseUsers.forEachIndexed { index, user ->
+            User(index + 1, user)
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }

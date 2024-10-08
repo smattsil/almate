@@ -1,7 +1,9 @@
 package com.example.almate
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
@@ -18,6 +20,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.example.almate.features.auth.presentation.LoginScreen
 import com.example.almate.features.home.presentation.HomeListDetailScreen
 import com.example.almate.features.home.presentation.components.HomeViewModel
 import com.example.almate.features.home.presentation.components.SubjectViewModel
@@ -29,6 +33,46 @@ import com.example.almate.features.tools.presentation.ToolsScreen
 import com.example.almate.features.tools.presentation.ToolsViewModel
 import com.example.almate.presentation.theme.proximaNovaFamily
 import kotlinx.serialization.Serializable
+
+@Serializable data object Auth
+@Serializable data object Main
+
+@Composable
+fun AlmateApp(
+    isLoggedIn: Boolean
+) {
+    Scaffold(
+        modifier = Modifier.fillMaxSize()
+    ) { innerPadding ->
+        val almateNavController = rememberNavController()
+        AlmateNavigation(
+            isLoggedIn = isLoggedIn,
+            navController = almateNavController,
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
+}
+
+@Composable
+fun AlmateNavigation(
+    isLoggedIn: Boolean,
+    navController: NavHostController,
+    modifier: Modifier
+) {
+    NavHost(
+        navController = navController,
+        startDestination = if (isLoggedIn) Main else Auth,
+        modifier = modifier
+    ) {
+        composable<Auth> {
+            LoginScreen()
+        }
+        composable<Main> {
+            val mainNavController = rememberNavController()
+            MainApp(mainNavController)
+        }
+    }
+}
 
 // Routes
 @Serializable data object Home

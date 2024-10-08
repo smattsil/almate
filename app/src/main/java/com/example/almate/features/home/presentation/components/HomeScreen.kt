@@ -6,11 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,19 +25,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -54,17 +44,15 @@ import coil.request.ImageRequest
 import com.example.almate.R
 import com.example.almate.data.model.GetGpaResponse
 import com.example.almate.data.model.SupabaseUser
-import com.example.almate.domain.model.Credentials
 import com.example.almate.features.home.data.model.GetGradesResponseItem
 import com.example.almate.features.home.presentation.HomeSkeletonScreen
 import com.example.almate.features.home.presentation.Subject
 import com.example.almate.presentation.ErrorScreen
 import com.example.almate.presentation.theme.cardBackgroundColor
-import kotlinx.coroutines.flow.first
 
 @Composable
 fun HomeScreen(
-    homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
     onSubjectClick: (Subject) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -77,32 +65,40 @@ fun HomeScreen(
     }
     when (homeViewModel.homeState) {
         is HomeState.Loading -> HomeSkeletonScreen(modifier = modifier)
-        is HomeState.Success ->
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
-                modifier = modifier
-                    .fillMaxSize()
-            ) {
-                item {
-                    UserInfo(homeViewModel.supabaseUser)
-                }
-                item {
-                    Spacer(Modifier.height(24.dp))
-                }
-                item {
-                    GpaAnalytics(homeViewModel.gpaResponse)
-                }
-                item {
-                    Spacer(Modifier.height(24.dp))
-                }
-                Grades(
-                    grades = homeViewModel.grades,
-                    onSortClick = { homeViewModel.showSortBottomSheet = true },
-                    onSubjectClick = { onSubjectClick(it) },
-                    sortType = homeViewModel.sortType
-                )
-            }
+        is HomeState.Success -> HomeScreen(onSubjectClick, homeViewModel, modifier)
         is HomeState.Error -> ErrorScreen(onClick = { homeViewModel.fetchData() })
+    }
+}
+
+@Composable
+private fun HomeScreen(
+    onSubjectClick: (Subject) -> Unit,
+    homeViewModel: HomeViewModel,
+    modifier: Modifier
+) {
+    LazyColumn(
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        item {
+            UserInfo(homeViewModel.supabaseUser)
+        }
+        item {
+            Spacer(Modifier.height(24.dp))
+        }
+        item {
+            GpaAnalytics(homeViewModel.gpaResponse)
+        }
+        item {
+            Spacer(Modifier.height(24.dp))
+        }
+        Grades(
+            grades = homeViewModel.grades,
+            onSortClick = { homeViewModel.showSortBottomSheet = true },
+            onSubjectClick = { onSubjectClick(it) },
+            sortType = homeViewModel.sortType
+        )
     }
 }
 

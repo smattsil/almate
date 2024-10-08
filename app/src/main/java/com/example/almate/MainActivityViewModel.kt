@@ -1,5 +1,6 @@
 package com.example.almate
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -28,10 +29,11 @@ class MainActivityViewModel @Inject constructor(
             credentialsFlow.collect { credentials ->
                 isLoggedIn = credentials.username.isNotBlank()
                 if (isLoggedIn == true) {
-                    val overallInfo = almaRepository.getOverallInfo(credentials)
                     try {
+                        val overallInfo = almaRepository.getOverallInfo(credentials)
                         supabaseRepository.updateUser(credentials.username, overallInfo)
                     } catch (e: Exception) {
+                        Log.d("OnLaunch", "Failed to update user data.")
                     }
                 }
             }

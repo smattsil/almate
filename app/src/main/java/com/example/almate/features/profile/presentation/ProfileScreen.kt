@@ -21,10 +21,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -35,11 +33,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -79,20 +72,14 @@ fun ProfileScreen(
     ) { innerPadding ->
         when (profileViewModel.profileState) {
             is ProfileState.Loading -> ProfileSkeletonScreen(modifier = modifier.padding(innerPadding))
-            is ProfileState.Success ->
-                Profile(
-                    onLogOutNavigate = onLogOutNavigate,
-                    profileViewModel = profileViewModel,
-                    scrollState = scrollState,
-                    modifier = modifier.padding(innerPadding)
-                )
+            is ProfileState.Success -> ProfileScreen(onLogOutNavigate, profileViewModel, scrollState, modifier.padding(innerPadding))
             is ProfileState.Error -> ErrorScreen(onClick = { profileViewModel.fetchData() })
         }
     }
 }
 
 @Composable
-fun Profile(
+private fun ProfileScreen(
     onLogOutNavigate: () -> Unit,
     profileViewModel: ProfileViewModel,
     scrollState: ScrollState,
