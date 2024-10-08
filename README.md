@@ -42,10 +42,9 @@ Kotlin
 - Shimmer (for the shimmer effect)
 
 Python
-- Render (to host the API)
-- FastAPI (to make the api)
+- FastAPI (api framework)
 - asyncio (for asynchronous programming)
-- aiohttp + selectolax (for web scraping the website)
+- aiohttp + selectolax (for web scraping)
 
 ## License
 This project is under no license. Please feel free to message @smattsil on IG if you have any problems or legal issues you would like to address.

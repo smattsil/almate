@@ -25,6 +25,8 @@ import com.example.almate.features.rankings.presentation.RankingsScreen
 import com.example.almate.features.rankings.presentation.RankingsViewModel
 import com.example.almate.features.profile.presentation.ProfileScreen
 import com.example.almate.features.profile.presentation.ProfileViewModel
+import com.example.almate.features.tools.presentation.ToolsScreen
+import com.example.almate.features.tools.presentation.ToolsViewModel
 import com.example.almate.presentation.theme.proximaNovaFamily
 import kotlinx.serialization.Serializable
 
@@ -143,7 +145,8 @@ fun AlmateNavHost(
             RankingsScreen(rankingsViewModel)
         }
         composable<Tools> {
-
+            val toolsViewModel: ToolsViewModel = hiltViewModel()
+            ToolsScreen()
         }
         composable<Profile> {
             val profileViewModel: ProfileViewModel = hiltViewModel()
