@@ -78,6 +78,8 @@ dependencies {
     implementation(libs.androidx.material3.adaptive.navigation.suite.android)
     implementation(libs.androidx.adaptive.navigation.android)
     implementation(libs.androidx.core.core.splashscreen)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
     kapt(libs.androidx.hilt.compiler)
     kapt(libs.hilt.android.compiler.v252)
     testImplementation(libs.junit)

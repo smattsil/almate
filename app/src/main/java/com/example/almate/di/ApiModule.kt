@@ -1,7 +1,7 @@
 package com.example.almate.di
 
-import android.app.Application
-import com.example.almate.data.remote.AlmaApi
+import android.content.Context
+import com.example.almate.data.remote.AlmateApi
 import com.example.almate.data.repository.AlmaRepositoryImpl
 import com.example.almate.data.repository.SupabaseRepositoryImpl
 import com.example.almate.data.repository.UserPreferencesRepository
@@ -10,6 +10,7 @@ import com.example.almate.domain.repository.SupabaseRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
@@ -22,28 +23,28 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object ApiModule {
 
     @Provides
     @Singleton
-    fun provideAlmaApi(): AlmaApi {
+    fun provideAlmaApi(): AlmateApi {
         return Retrofit.Builder()
-            .baseUrl("https://alma-api.onrender.com")
+            .baseUrl("https://almate-api.onrender.com")
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
-            .create(AlmaApi::class.java)
+            .create(AlmateApi::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideAlmaRepository(api: AlmaApi): AlmaRepository {
+    fun provideAlmaRepository(api: AlmateApi): AlmaRepository {
         return AlmaRepositoryImpl(api)
     }
 
     @Provides
     @Singleton
-    fun provideUserPreferencesRepository(app: Application): UserPreferencesRepository {
-        return UserPreferencesRepository(app)
+    fun provideUserPreferencesRepository(@ApplicationContext context: Context): UserPreferencesRepository {
+        return UserPreferencesRepository(context)
     }
 
     @Provides

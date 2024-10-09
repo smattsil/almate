@@ -1,17 +1,15 @@
 package com.example.almate.features.tools.presentation.chat
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,7 +26,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -44,17 +41,30 @@ fun ChatScreen(
 ) {
     Scaffold(
         topBar = { ChatTopAppBar(onBackButtonClick = onBackButtonClick) },
-        bottomBar = { ChatBottomAppBar(
-            value = chatViewModel.message,
-            onValueChange = { chatViewModel.message = it },
-            modifier = Modifier
-        ) }
     ) { innerPadding ->
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .background(Color.Blue)
+                    .weight(1f)
+                    .padding()
+            ) {
+                for (i in 1..100) {
+                    Text(
+                        text = "Hi!",
+                    )
+                }
+            }
+            ChatBottomAppBar(
+                value = chatViewModel.message,
+                onValueChange = { chatViewModel.message = it },
+                modifier = Modifier
+            )
         }
     }
 }
@@ -97,23 +107,25 @@ fun ChatBottomAppBar(
         verticalAlignment = Alignment.Bottom,
         modifier = modifier
             .fillMaxWidth()
-            .height(IntrinsicSize.Min)
+            .background(Color.Red)
             .padding(horizontal = 16.dp, vertical = 24.dp)
-            .imePadding()
     ) {
         MessageTextField(
             value = value,
             onValueChange = { onValueChange(it) },
-            modifier = Modifier.weight(9f)
+            modifier = Modifier
+                .weight(1f)
         )
         Spacer(Modifier.width(8.dp))
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
+                .size(48.dp)
                 .clip(RoundedCornerShape(12.dp))
+                .clickable { }
                 .fillMaxSize()
                 .background(Color.White)
-                .weight(1f)
+                .border(2.dp, Color.Black.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
         ) {
             Icon(
                 painter = painterResource(R.drawable.arrow_upward_24dp_e8eaed_fill0_wght400_grad0_opsz24),

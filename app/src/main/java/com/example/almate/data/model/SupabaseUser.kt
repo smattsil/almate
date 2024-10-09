@@ -1,10 +1,14 @@
 package com.example.almate.data.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Entity
 @Serializable
 data class SupabaseUser(
+    @PrimaryKey
     @SerialName("username")
     val username: String,
     @SerialName("full_name")

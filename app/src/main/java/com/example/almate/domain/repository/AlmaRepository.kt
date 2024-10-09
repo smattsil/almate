@@ -4,11 +4,10 @@ import com.example.almate.data.model.GetGpaResponse
 import com.example.almate.data.model.GetOverallInfoResponse
 import com.example.almate.domain.model.Credentials
 import com.example.almate.features.auth.data.model.GetAuthenticityResponse
-import com.example.almate.features.home.data.model.GetGradesResponse
 import com.example.almate.features.home.data.model.GetGradesResponseItem
 import com.example.almate.features.home.data.model.GetSubjectResponse
-import com.example.almate.features.profile.data.GetAttendancesResponse
-import com.example.almate.features.profile.data.GetPersonalInfoResponse
+import com.example.almate.features.profile.data.model.GetAttendancesResponse
+import com.example.almate.features.profile.data.model.GetPersonalInfoResponse
 
 interface AlmaRepository {
 

@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.almate.data.model.GetGpaResponse
 import com.example.almate.data.model.SupabaseUser
+import com.example.almate.features.home.data.repository.SupabaseUserRepository
 import com.example.almate.data.repository.UserPreferencesRepository
-import com.example.almate.domain.model.Credentials
 import com.example.almate.domain.repository.AlmaRepository
 import com.example.almate.domain.repository.SupabaseRepository
 import com.example.almate.features.home.data.model.GetGradesResponseItem
@@ -21,10 +21,20 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed interface HomeState {
-    object Loading : HomeState
-    object Success : HomeState
-    object Error : HomeState
+    data object Loading : HomeState
+    data class Success(
+        val homeData: HomeData,
+        val isRefreshing: Boolean
+    ) : HomeState
+    data object Error : HomeState
 }
+
+data class HomeData(
+    val supabaseUser: SupabaseUser,
+    val gpaResponse: GetGpaResponse,
+    val grades: List<GetGradesResponseItem>,
+    val sortType: SubjectSortType
+)
 
 enum class SubjectSortType {
     ALPHABET, PERCENTAGE, WEIGHT, TEACHER
@@ -34,7 +44,8 @@ enum class SubjectSortType {
 class HomeViewModel @Inject constructor(
     private val almaRepository: AlmaRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val supabaseRepository: SupabaseRepository
+    private val supabaseRepository: SupabaseRepository,
+    private val supabaseUserRepository: SupabaseUserRepository
 ): ViewModel() {
 
     var homeState: HomeState by mutableStateOf(HomeState.Loading)
@@ -43,7 +54,6 @@ class HomeViewModel @Inject constructor(
     var gpaResponse: GetGpaResponse by mutableStateOf(GetGpaResponse("", ""))
     var grades: List<GetGradesResponseItem> by mutableStateOf(emptyList())
     var showSortBottomSheet: Boolean by mutableStateOf(false)
-    var sortType: SubjectSortType by mutableStateOf(SubjectSortType.ALPHABET)
 
     init {
         fetchData()
@@ -57,6 +67,7 @@ class HomeViewModel @Inject constructor(
                     val credentials = userPreferencesRepository.credentialsFlow.first()
                     async {
                         supabaseUser = supabaseRepository.getUser(credentials.username)
+                        supabaseUserRepository.upsertSupabaseUser(supabaseUser)
                     }
                     async {
                         gpaResponse = almaRepository.getGpa(credentials)
@@ -65,15 +76,20 @@ class HomeViewModel @Inject constructor(
                         grades = almaRepository.getGrades(credentials).sortedBy { it.name }
                     }
                 }
-                homeState = HomeState.Success
+                homeState = HomeState.Success(HomeData(supabaseUser, gpaResponse, grades, SubjectSortType.ALPHABET), false)
             } catch (e: Exception) {
                 homeState = HomeState.Error
             }
         }
     }
 
-    fun silentFetchData() {
+    fun refresh() {
+        val currentState = homeState
+        if (currentState !is HomeState.Success) {
+            return
+        }
         viewModelScope.launch {
+            homeState = currentState.copy(isRefreshing = true)
             try {
                 coroutineScope {
                     val credentials = userPreferencesRepository.credentialsFlow.first()
@@ -87,30 +103,51 @@ class HomeViewModel @Inject constructor(
                         grades = almaRepository.getGrades(credentials).sortedBy { it.name }
                     }
                 }
+                homeState = HomeState.Success(HomeData(supabaseUser, gpaResponse, grades, SubjectSortType.ALPHABET), false)
             } catch (e: Exception) {
-                Log.d("ALMATE", "Failed to silently fetch data.")
+                homeState = HomeState.Error
             }
         }
     }
 
     fun sortBy(type: SubjectSortType) {
-        grades = when (type) {
+        val currentState = homeState
+        if (currentState !is HomeState.Success) {
+            return
+        }
+        homeState = when (type) {
            SubjectSortType.ALPHABET -> {
-               sortType = SubjectSortType.ALPHABET
-               grades.sortedByDescending { it.name }
+               currentState.copy(
+                   homeData = currentState.homeData.copy(
+                       grades = currentState.homeData.grades.sortedByDescending { it.name },
+                       sortType = SubjectSortType.ALPHABET
+                   )
+               )
            }
-            SubjectSortType.WEIGHT -> {
-                sortType = SubjectSortType.WEIGHT
-                grades.sortedByDescending { it.weight }
-            }
-            SubjectSortType.PERCENTAGE -> {
-                sortType = SubjectSortType.PERCENTAGE
-                sortGradesByPercent(grades)
-            }
-            SubjectSortType.TEACHER -> {
-                sortType = SubjectSortType.TEACHER
-                grades.sortedByDescending { it.teacher }
-            }
+           SubjectSortType.WEIGHT -> {
+               currentState.copy(
+                   homeData = currentState.homeData.copy(
+                       grades = currentState.homeData.grades.sortedByDescending { it.weight },
+                       sortType = SubjectSortType.WEIGHT
+                   )
+               )
+           }
+           SubjectSortType.PERCENTAGE -> {
+               currentState.copy(
+                   homeData = currentState.homeData.copy(
+                       grades = sortGradesByPercent(currentState.homeData.grades),
+                       sortType = SubjectSortType.PERCENTAGE
+                   )
+               )
+           }
+           SubjectSortType.TEACHER -> {
+               currentState.copy(
+                   homeData = currentState.homeData.copy(
+                       grades = currentState.homeData.grades.sortedByDescending { it.teacher },
+                       sortType = SubjectSortType.TEACHER
+                   )
+               )
+           }
         }
     }
 

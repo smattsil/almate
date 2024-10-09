@@ -22,9 +22,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,51 +58,86 @@ import com.example.almate.presentation.theme.cardBackgroundColor
 fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
     onSubjectClick: (Subject) -> Unit,
+    innerPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
+    val homeState = homeViewModel.homeState
     if (homeViewModel.showSortBottomSheet) {
         SortSubjectBottomSheet(
             onDismissRequest = { homeViewModel.showSortBottomSheet = false },
             onSortSelection = { homeViewModel.sortBy(it) },
-            sortType = homeViewModel.sortType
+            sortType = (homeState as HomeState.Success).homeData.sortType
         )
     }
-    when (homeViewModel.homeState) {
+    when (homeState) {
         is HomeState.Loading -> HomeSkeletonScreen(modifier = modifier)
-        is HomeState.Success -> HomeScreen(onSubjectClick, homeViewModel, modifier)
+        is HomeState.Success -> HomeScreen(
+            onSubjectClick = onSubjectClick,
+            innerPadding = innerPadding,
+            homeData = homeState.homeData,
+            isRefreshing = homeState.isRefreshing,
+            onRefresh = { homeViewModel.refresh() },
+            sortType = homeState.homeData.sortType,
+            onSortClick = { homeViewModel.showSortBottomSheet = true },
+            modifier = modifier
+        )
         is HomeState.Error -> ErrorScreen(onClick = { homeViewModel.fetchData() })
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
     onSubjectClick: (Subject) -> Unit,
-    homeViewModel: HomeViewModel,
+    innerPadding: PaddingValues,
+    homeData: HomeData,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
+    sortType: SubjectSortType,
+    onSortClick: () -> Unit,
     modifier: Modifier
 ) {
-    LazyColumn(
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
-        modifier = modifier
-            .fillMaxSize()
+    val pullToRefreshState = rememberPullToRefreshState()
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+        state = pullToRefreshState,
+        indicator = {
+            Indicator(
+                containerColor = cardBackgroundColor,
+                color = MaterialTheme.colorScheme.primary,
+                isRefreshing = isRefreshing,
+                state = pullToRefreshState,
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .align(Alignment.TopCenter),
+            )
+        }
     ) {
-        item {
-            UserInfo(homeViewModel.supabaseUser)
+        LazyColumn(
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+            modifier = modifier
+                .fillMaxSize()
+        ) {
+            item {
+                UserInfo(homeData.supabaseUser)
+            }
+            item {
+                Spacer(Modifier.height(24.dp))
+            }
+            item {
+                GpaAnalytics(homeData.gpaResponse)
+            }
+            item {
+                Spacer(Modifier.height(24.dp))
+            }
+            Grades(
+                grades = homeData.grades,
+                onSortClick = onSortClick,
+                onSubjectClick = { onSubjectClick(it) },
+                sortType = sortType
+            )
         }
-        item {
-            Spacer(Modifier.height(24.dp))
-        }
-        item {
-            GpaAnalytics(homeViewModel.gpaResponse)
-        }
-        item {
-            Spacer(Modifier.height(24.dp))
-        }
-        Grades(
-            grades = homeViewModel.grades,
-            onSortClick = { homeViewModel.showSortBottomSheet = true },
-            onSubjectClick = { onSubjectClick(it) },
-            sortType = homeViewModel.sortType
-        )
     }
 }
 

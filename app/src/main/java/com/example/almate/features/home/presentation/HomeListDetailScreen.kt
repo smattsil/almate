@@ -9,12 +9,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,6 +28,10 @@ import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneSca
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -95,6 +101,7 @@ fun HomeListDetailScreen(
                                 content = subject
                             )
                         },
+                        innerPadding = innerPadding,
                         modifier = Modifier
                             .padding(innerPadding)
                             .animateContentSize()
@@ -115,7 +122,7 @@ fun HomeListDetailScreen(
                         }
                     }
                 } else {
-                    if (homeViewModel.homeState == HomeState.Success) {
+                    if (homeViewModel.homeState is HomeState.Success) {
                         AnimatedPane {
                             SubjectPlaceholderScreen()
                         }
@@ -132,39 +139,41 @@ fun HomeTopAppBar(
     onProfilePictureClick: () -> Unit,
     profilePictureUrl: String
 ) {
-    TopAppBar(
-        title = {
-            Icon(
-                painter = painterResource(R.drawable.almate),
-                contentDescription = null,
-                modifier = Modifier.size(80.dp)
-            )
-        },
-        actions = {
-            IconButton(onClick = {}) {
+    Column {
+        TopAppBar(
+            title = {
                 Icon(
-                    painter = painterResource(R.drawable.notifications_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                    painter = painterResource(R.drawable.almate),
                     contentDescription = null,
-                    modifier = Modifier
-                        .size(32.dp)
+                    modifier = Modifier.size(80.dp)
                 )
-            }
-            IconButton(onClick = onProfilePictureClick) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(profilePictureUrl)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                )
-            }
-        },
-        modifier = Modifier
-    )
+            },
+            actions = {
+                IconButton(onClick = {}) {
+                    Icon(
+                        painter = painterResource(R.drawable.notifications_24dp_e8eaed_fill0_wght400_grad0_opsz24),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(32.dp)
+                    )
+                }
+                IconButton(onClick = onProfilePictureClick) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(profilePictureUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                    )
+                }
+            },
+            modifier = Modifier
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

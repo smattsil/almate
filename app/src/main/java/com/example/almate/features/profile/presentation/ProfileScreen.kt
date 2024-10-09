@@ -1,5 +1,6 @@
 package com.example.almate.features.profile.presentation
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,12 +28,17 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,8 +58,8 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.almate.R
-import com.example.almate.features.profile.data.GetAttendancesResponse
-import com.example.almate.features.profile.data.GetPersonalInfoResponse
+import com.example.almate.features.profile.data.model.GetAttendancesResponse
+import com.example.almate.features.profile.data.model.GetPersonalInfoResponse
 import com.example.almate.features.profile.presentation.components.LogOutDialog
 import com.example.almate.presentation.ErrorScreen
 import com.example.almate.presentation.theme.cardBackgroundColor
@@ -62,106 +69,141 @@ import com.example.almate.presentation.theme.proximaNovaFamily
 fun ProfileScreen(
     profileViewModel: ProfileViewModel,
     scrollState: ScrollState = rememberScrollState(),
-    onLogOutNavigate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         topBar = {
-            ProfileTopAppBar()
+            ProfileTopAppBar(showingCached = profileViewModel.profileState is ProfileState.CachedSuccess)
         }
     ) { innerPadding ->
-        when (profileViewModel.profileState) {
+        val profileState = profileViewModel.profileState
+        when (profileState) {
             is ProfileState.Loading -> ProfileSkeletonScreen(modifier = modifier.padding(innerPadding))
-            is ProfileState.Success -> ProfileScreen(onLogOutNavigate, profileViewModel, scrollState, modifier.padding(innerPadding))
+            is ProfileState.CachedSuccess -> ProfileScreen(
+                innerPadding = innerPadding,
+                isRefreshing = false,
+                onRefresh = { },
+                scrollState = scrollState,
+                profileViewModel = profileViewModel,
+                modifier = modifier.padding(innerPadding)
+            )
+            is ProfileState.Success -> ProfileScreen(
+                innerPadding = innerPadding,
+                isRefreshing = profileState.isRefreshing,
+                onRefresh = { profileViewModel.refresh() },
+                scrollState = scrollState,
+                profileViewModel = profileViewModel,
+                modifier = modifier.padding(innerPadding)
+            )
             is ProfileState.Error -> ErrorScreen(onClick = { profileViewModel.fetchData() })
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProfileScreen(
-    onLogOutNavigate: () -> Unit,
-    profileViewModel: ProfileViewModel,
+    innerPadding: PaddingValues,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
     scrollState: ScrollState,
+    profileViewModel: ProfileViewModel,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .padding(horizontal = 16.dp, vertical = 24.dp)
+    val pullToRefreshState = rememberPullToRefreshState()
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+        state = pullToRefreshState,
+        indicator = {
+            Indicator(
+                containerColor = cardBackgroundColor,
+                color = MaterialTheme.colorScheme.primary,
+                isRefreshing = isRefreshing,
+                state = pullToRefreshState,
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .align(Alignment.TopCenter),
+            )
+        }
     ) {
-        if (profileViewModel.showConfirmDialog) {
-            LogOutDialog(
-                onDismissRequest = { profileViewModel.showConfirmDialog = false },
-                onButtonClick = {
-                    profileViewModel.logout(it)
-                    profileViewModel.showConfirmDialog = false
-                    onLogOutNavigate()
-                }
-            )
-        }
-        if (profileViewModel.showUpdateProfilePictureDialog) {
-            ChangeProfilePictureDialog(
-                onDismissRequest = {
-                    profileViewModel.showUpdateProfilePictureDialog = false
-                },
-                onConfirmation = {
-                    profileViewModel.updateProfilePicture(it)
-                    profileViewModel.showUpdateProfilePictureDialog = false
-                },
-                textValue = profileViewModel.supabaseUser!!.profilePicture,
-                onValueChange = { profileViewModel.onPfpValueChange(it) }
-            )
-        }
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(82.dp)
-                .clip(CircleShape)
-                .clickable { profileViewModel.showUpdateProfilePictureDialog = true }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(horizontal = 16.dp, vertical = 24.dp)
         ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(profileViewModel.supabaseUser!!.profilePicture)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(
-                    Color.Black.copy(0.5f),
-                    blendMode = BlendMode.Darken
+            if (profileViewModel.showConfirmDialog) {
+                LogOutDialog(
+                    onDismissRequest = { profileViewModel.showConfirmDialog = false },
+                    onButtonClick = {
+                        profileViewModel.logout(it)
+                        profileViewModel.showConfirmDialog = false
+                    }
+                )
+            }
+            if (profileViewModel.showUpdateProfilePictureDialog) {
+                ChangeProfilePictureDialog(
+                    onDismissRequest = {
+                        profileViewModel.showUpdateProfilePictureDialog = false
+                    },
+                    onConfirmation = {
+                        profileViewModel.updateProfilePicture(it)
+                        profileViewModel.showUpdateProfilePictureDialog = false
+                    },
+                    textValue = profileViewModel.supabaseUser!!.profilePicture,
+                    onValueChange = { profileViewModel.onPfpValueChange(it) }
+                )
+            }
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(82.dp)
+                    .clip(CircleShape)
+                    .clickable { profileViewModel.showUpdateProfilePictureDialog = true }
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(profileViewModel.supabaseUser!!.profilePicture)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(
+                        Color.Black.copy(0.5f),
+                        blendMode = BlendMode.Darken
+                    ),
+                    contentScale = ContentScale.Crop
+                )
+                Icon(
+                    painter = painterResource(R.drawable.edit_24dp_e8eaed_fill1_wght400_grad0_opsz24),
+                    tint = Color.White,
+                    contentDescription = null,
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            GeneralInfo(personalInfo = profileViewModel.personalInfo)
+            Spacer(modifier = Modifier.height(24.dp))
+            AttendanceInfo(attendances = profileViewModel.attendances)
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFBD3E3E),
+                    contentColor = Color.White
                 ),
-                contentScale = ContentScale.Crop
-            )
-            Icon(
-                painter = painterResource(R.drawable.edit_24dp_e8eaed_fill1_wght400_grad0_opsz24),
-                tint = Color.White,
-                contentDescription = null,
-            )
-        }
-        Spacer(modifier = Modifier.height(24.dp))
-        GeneralInfo(personalInfo = profileViewModel.personalInfo)
-        Spacer(modifier = Modifier.height(24.dp))
-        AttendanceInfo(attendances = profileViewModel.attendances)
-        Spacer(modifier = Modifier.height(24.dp))
-        Button(
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFBD3E3E),
-                contentColor = Color.White
-            ),
-            onClick = {
-                profileViewModel.showConfirmDialog = true
-            },
-            shape = RoundedCornerShape(12.dp),
-            border = BorderStroke(2.dp, Color.Black.copy(alpha = 0.1f)),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "Log out",
-                fontWeight = FontWeight.Bold,
-                fontFamily = proximaNovaFamily
-            )
+                onClick = {
+                    profileViewModel.showConfirmDialog = true
+                },
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(2.dp, Color.Black.copy(alpha = 0.1f)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Log out",
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = proximaNovaFamily
+                )
+            }
         }
     }
 }
@@ -435,16 +477,23 @@ fun ChangeProfilePictureDialog(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileTopAppBar() {
-    TopAppBar(
-        title = {
-            Text(
-                text = "Profile",
-                fontFamily = proximaNovaFamily,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+fun ProfileTopAppBar(
+    showingCached: Boolean
+) {
+    Column {
+        TopAppBar(
+            title = {
+                Text(
+                    text = "Profile",
+                    fontFamily = proximaNovaFamily,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        )
+        AnimatedVisibility(showingCached) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         }
-    )
+    }
 }

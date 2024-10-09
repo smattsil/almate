@@ -1,5 +1,6 @@
 package com.example.almate
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -43,12 +44,12 @@ fun AlmateApp(
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize()
-    ) { innerPadding ->
+    ) {
+        val innerPadding = it
         val almateNavController = rememberNavController()
         AlmateNavigation(
             isLoggedIn = isLoggedIn,
-            navController = almateNavController,
-            modifier = Modifier.padding(innerPadding)
+            navController = almateNavController
         )
     }
 }
@@ -57,7 +58,7 @@ fun AlmateApp(
 fun AlmateNavigation(
     isLoggedIn: Boolean,
     navController: NavHostController,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
@@ -194,18 +195,7 @@ fun MainNavigation(
         }
         composable<Profile> {
             val profileViewModel: ProfileViewModel = hiltViewModel()
-            ProfileScreen(
-                profileViewModel = profileViewModel,
-                onLogOutNavigate = {
-                    navController.navigate(Home) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            )
+            ProfileScreen(profileViewModel = profileViewModel)
         }
     }
 }

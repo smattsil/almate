@@ -32,6 +32,8 @@ adaptiveNavigationAndroid = "1.0.0"
 coreSplashscreen = "*"
 coreSplashscreenVersion = "1.2.0-alpha02"
 androidxCoreSplashscreen = "1.0.1"
+roomKtx = "2.6.0-alpha01"
+roomCompiler = "2.6.0-alpha01"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -73,6 +75,8 @@ androidx-adaptive-navigation-android = { group = "androidx.compose.material3.ada
 core-splashscreen = { group = "androidx-core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreenVersion" }
 androidx-core-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxCoreSplashscreen" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

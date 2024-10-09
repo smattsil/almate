@@ -46,48 +46,63 @@ import kotlinx.serialization.Serializable
 @Serializable data object FinalGradeCalculator
 @Serializable data object StudyTips
 @Serializable data object GoalSetter
+@Serializable data object University
 @Serializable data object JobProspects
 
 enum class Tools(
     val icon: Int,
     val label: String,
     val route: Any,
+    val enabled: Boolean,
     val description: String
 ) {
     CHAT(
         icon = R.drawable.robot_24dp_e8eaed_fill0_wght400_grad0_opsz48,
         label = "Chat",
         route = Chat,
+        enabled = true,
         description = "Talk to Almate (AI) for insights on your grades and GPA."
     ),
     FINAL_GRADE_CALCULATOR(
         icon = R.drawable.function_24dp_e8eaed_fill0_wght400_grad0_opsz48,
         label = "Final Grade Calculator",
         route = FinalGradeCalculator,
+        enabled = true,
         description = "Calculate how much you need on your final for a certain grade."
     ),
     GRADE_PREDICTOR(
         icon = R.drawable.book_4_spark_24dp_e8eaed_fill0_wght400_grad0_opsz48,
         label = "Grade Predictor",
         route = GradePredictor,
+        enabled = false,
         description = "Use AI to predict where your grades are heading."
     ),
     STUDY_TIPS(
-        icon = R.drawable.school_24dp_e8eaed_fill0_wght400_grad0_opsz48,
+        icon = R.drawable.edit_24dp_e8eaed_fill0_wght400_grad0_opsz48,
         label = "Study Tips",
         route = StudyTips,
+        enabled = false,
         description = "View personalized study tips based on your performance."
     ),
     GOAL_SETTER(
         icon = R.drawable.flag_24dp_e8eaed_fill0_wght400_grad0_opsz48,
         label = "Goal Setter",
         route = GoalSetter,
+        enabled = false,
         description = "Set goals for subjects and track your progress."
+    ),
+    UNIVERSITY(
+        icon = R.drawable.school_24dp_e8eaed_fill0_wght400_grad0_opsz48,
+        label = "University",
+        route = University,
+        enabled = false,
+        description = "Get university recommendations based on your capabilities."
     ),
     JOB_PROSPECTS(
         icon = R.drawable.hail_24dp_e8eaed_fill0_wght400_grad0_opsz48,
         label = "Job Prospects",
         route = JobProspects,
+        enabled = false,
         description = "See how your strengths could shape your career."
     )
 }
@@ -143,6 +158,7 @@ fun ToolsGrid(
         ) {
             items(Tools.entries) { tool ->
                 Tool(
+                    enabled = tool.enabled,
                     icon = tool.icon,
                     label = tool.label,
                     description = tool.description,
@@ -155,6 +171,7 @@ fun ToolsGrid(
 
 @Composable
 fun Tool(
+    enabled: Boolean,
     icon: Int,
     label: String,
     description: String,
@@ -163,9 +180,16 @@ fun Tool(
 ) {
     Column(
         modifier = modifier
+            .alpha(if (enabled) 1f else 0.7f)
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .clickable { onToolClick() }
+            .then(
+                if (enabled) {
+                    Modifier.clickable { onToolClick() }
+                } else {
+                    Modifier
+                }
+            )
             .background(cardBackgroundColor)
             .border(2.dp, Color.Black.copy(0.1f), RoundedCornerShape(12.dp))
             .padding(horizontal = 18.dp, vertical = 16.dp)
