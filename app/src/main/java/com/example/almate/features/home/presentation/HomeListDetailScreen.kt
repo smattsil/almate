@@ -79,7 +79,8 @@ fun HomeListDetailScreen(
     Scaffold(
         topBar = {
             if (!subjectOpened) HomeTopAppBar(
-                profilePictureUrl = homeViewModel.supabaseUser.profilePicture,
+                showingCached = homeViewModel.homeState is HomeState.CachedSuccess,
+//                profilePictureUrl = homeViewModel.supabaseUser!!.profilePicture,
                 onProfilePictureClick = onProfilePictureClick
             ) else SubjectTopAppBar(
                 subjectResponse = subjectViewModel.subjectResponse,
@@ -136,8 +137,9 @@ fun HomeListDetailScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopAppBar(
+    showingCached: Boolean,
     onProfilePictureClick: () -> Unit,
-    profilePictureUrl: String
+//    profilePictureUrl: String
 ) {
     Column {
         TopAppBar(
@@ -157,22 +159,25 @@ fun HomeTopAppBar(
                             .size(32.dp)
                     )
                 }
-                IconButton(onClick = onProfilePictureClick) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(profilePictureUrl)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clip(CircleShape)
-                    )
-                }
+//                IconButton(onClick = onProfilePictureClick) {
+//                    AsyncImage(
+//                        model = ImageRequest.Builder(LocalContext.current)
+//                            .data(profilePictureUrl)
+//                            .crossfade(true)
+//                            .build(),
+//                        contentDescription = null,
+//                        contentScale = ContentScale.Crop,
+//                        modifier = Modifier
+//                            .size(32.dp)
+//                            .clip(CircleShape)
+//                    )
+//                }
             },
             modifier = Modifier
         )
+        AnimatedVisibility(showingCached) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        }
     }
 }
 

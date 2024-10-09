@@ -61,6 +61,7 @@ import com.example.almate.R
 import com.example.almate.features.profile.data.model.GetAttendancesResponse
 import com.example.almate.features.profile.data.model.GetPersonalInfoResponse
 import com.example.almate.features.profile.presentation.components.LogOutDialog
+import com.example.almate.features.tools.presentation.components.AlmateTextField
 import com.example.almate.presentation.ErrorScreen
 import com.example.almate.presentation.theme.cardBackgroundColor
 import com.example.almate.presentation.theme.proximaNovaFamily
@@ -434,10 +435,10 @@ fun ChangeProfilePictureDialog(
                 .border(2.dp, Color.Black.copy(alpha = 0.10f), RoundedCornerShape(12.dp))
                 .padding(horizontal = 18.dp, vertical = 16.dp)
         ) {
-            TextField(
+            AlmateTextField(
                 value = textValue,
-                onValueChange = { onValueChange(it) },
-                singleLine = true
+                singleLine = true,
+                onValueChange = { onValueChange(it) }
             )
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,

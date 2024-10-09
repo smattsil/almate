@@ -1,6 +1,5 @@
 package com.example.almate.features.home.presentation.components
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,11 +7,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.almate.data.model.GetGpaResponse
 import com.example.almate.data.model.SupabaseUser
-import com.example.almate.features.home.data.repository.SupabaseUserRepository
 import com.example.almate.data.repository.UserPreferencesRepository
 import com.example.almate.domain.repository.AlmaRepository
 import com.example.almate.domain.repository.SupabaseRepository
 import com.example.almate.features.home.data.model.GetGradesResponseItem
+import com.example.almate.features.home.data.repository.GpaRepository
+import com.example.almate.features.home.data.repository.GradesRepository
+import com.example.almate.features.home.data.repository.SupabaseUserRepository
+import com.example.almate.features.profile.presentation.ProfileData
+import com.example.almate.features.profile.presentation.ProfileState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -22,6 +25,9 @@ import javax.inject.Inject
 
 sealed interface HomeState {
     data object Loading : HomeState
+    data class CachedSuccess(
+        val homeData: HomeData
+    ) : HomeState
     data class Success(
         val homeData: HomeData,
         val isRefreshing: Boolean
@@ -42,45 +48,70 @@ enum class SubjectSortType {
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+
     private val almaRepository: AlmaRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val supabaseRepository: SupabaseRepository,
-    private val supabaseUserRepository: SupabaseUserRepository
+
+    private val supabaseUserRepository: SupabaseUserRepository,
+    private val gpaRepository: GpaRepository,
+    private val gradesRepository: GradesRepository,
+
 ): ViewModel() {
 
     var homeState: HomeState by mutableStateOf(HomeState.Loading)
 
-    var supabaseUser: SupabaseUser by mutableStateOf(SupabaseUser("", "", 0, "", "", ""))
-    var gpaResponse: GetGpaResponse by mutableStateOf(GetGpaResponse("", ""))
-    var grades: List<GetGradesResponseItem> by mutableStateOf(emptyList())
+    var supabaseUser: SupabaseUser? by mutableStateOf(null)
+    var gpaResponse: GetGpaResponse? by mutableStateOf(null)
+    var grades: List<GetGradesResponseItem>? by mutableStateOf(null)
     var showSortBottomSheet: Boolean by mutableStateOf(false)
 
     init {
-        fetchData()
+        try {
+            fetchDataWithCache()
+        } catch (e: Exception) {
+            fetchData()
+        }
     }
 
     fun fetchData() {
         viewModelScope.launch {
-            homeState = HomeState.Loading
             try {
                 coroutineScope {
                     val credentials = userPreferencesRepository.credentialsFlow.first()
                     async {
                         supabaseUser = supabaseRepository.getUser(credentials.username)
-                        supabaseUserRepository.upsertSupabaseUser(supabaseUser)
+                        supabaseUserRepository.upsertSupabaseUser(supabaseUser!!)
                     }
                     async {
                         gpaResponse = almaRepository.getGpa(credentials)
+                        gpaRepository.upsertGpa(gpaResponse!!)
                     }
                     async {
                         grades = almaRepository.getGrades(credentials).sortedBy { it.name }
+                        gradesRepository.upsertGrades(grades!!)
                     }
                 }
-                homeState = HomeState.Success(HomeData(supabaseUser, gpaResponse, grades, SubjectSortType.ALPHABET), false)
+                homeState = HomeState.Success(HomeData(supabaseUser!!, gpaResponse!!, grades!!, SubjectSortType.ALPHABET), false)
             } catch (e: Exception) {
                 homeState = HomeState.Error
             }
         }
+    }
+
+    fun fetchDataWithCache() {
+        viewModelScope.launch {
+            homeState = HomeState.Loading
+            try {
+                supabaseUser = supabaseUserRepository.getSupabaseUser()
+                gpaResponse = gpaRepository.getGpa()
+                grades = gradesRepository.getGrades()
+                homeState = HomeState.CachedSuccess(HomeData(supabaseUser!!, gpaResponse!!, grades!!, sortType = SubjectSortType.ALPHABET))
+            } catch (e: Exception) {
+                homeState = HomeState.Loading
+            }
+        }
+        fetchData()
     }
 
     fun refresh() {
@@ -95,15 +126,18 @@ class HomeViewModel @Inject constructor(
                     val credentials = userPreferencesRepository.credentialsFlow.first()
                     async {
                         supabaseUser = supabaseRepository.getUser(credentials.username)
+                        supabaseUserRepository.upsertSupabaseUser(supabaseUser!!)
                     }
                     async {
                         gpaResponse = almaRepository.getGpa(credentials)
+                        gpaRepository.upsertGpa(gpaResponse!!)
                     }
                     async {
                         grades = almaRepository.getGrades(credentials).sortedBy { it.name }
+                        gradesRepository.upsertGrades(grades!!)
                     }
                 }
-                homeState = HomeState.Success(HomeData(supabaseUser, gpaResponse, grades, SubjectSortType.ALPHABET), false)
+                homeState = HomeState.Success(HomeData(supabaseUser!!, gpaResponse!!, grades!!, SubjectSortType.ALPHABET), false)
             } catch (e: Exception) {
                 homeState = HomeState.Error
             }

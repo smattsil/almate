@@ -8,6 +8,10 @@ import com.example.almate.data.repository.SupabaseRepositoryImpl
 import com.example.almate.data.repository.UserPreferencesRepository
 import com.example.almate.domain.repository.AlmaRepository
 import com.example.almate.domain.repository.SupabaseRepository
+import com.example.almate.features.home.data.room.GpaDao
+import com.example.almate.features.home.data.room.GpaDatabase
+import com.example.almate.features.home.data.room.GradesDao
+import com.example.almate.features.home.data.room.GradesDatabase
 import com.example.almate.features.home.data.room.SupabaseUserDao
 import com.example.almate.features.home.data.room.SupabaseUserDatabase
 import com.example.almate.features.profile.data.room.AttendancesDao
@@ -72,6 +76,34 @@ object RoomModule {
     @Singleton
     fun provideAttendancesDao(attendancesDatabase: AttendancesDatabase): AttendancesDao {
         return attendancesDatabase.dao()
+    }
+
+    // gpa cache
+    @Provides
+    @Singleton
+    fun provideGpaDatabase(@ApplicationContext context: Context): GpaDatabase {
+        return Room.databaseBuilder(context, GpaDatabase::class.java, "GpaDatabase")
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGpaDao(gpaDatabase: GpaDatabase): GpaDao {
+        return gpaDatabase.dao()
+    }
+
+    // gpa cache
+    @Provides
+    @Singleton
+    fun provideGradesDatabase(@ApplicationContext context: Context): GradesDatabase {
+        return Room.databaseBuilder(context, GradesDatabase::class.java, "GradesDatabase")
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGradesDao(gradesDatabase: GradesDatabase): GradesDao {
+        return gradesDatabase.dao()
     }
 
 }

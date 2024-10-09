@@ -1,5 +1,6 @@
 package com.example.almate.features.home.presentation.components
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -69,19 +70,31 @@ fun HomeScreen(
             sortType = (homeState as HomeState.Success).homeData.sortType
         )
     }
-    when (homeState) {
-        is HomeState.Loading -> HomeSkeletonScreen(modifier = modifier)
-        is HomeState.Success -> HomeScreen(
-            onSubjectClick = onSubjectClick,
-            innerPadding = innerPadding,
-            homeData = homeState.homeData,
-            isRefreshing = homeState.isRefreshing,
-            onRefresh = { homeViewModel.refresh() },
-            sortType = homeState.homeData.sortType,
-            onSortClick = { homeViewModel.showSortBottomSheet = true },
-            modifier = modifier
-        )
-        is HomeState.Error -> ErrorScreen(onClick = { homeViewModel.fetchData() })
+    Crossfade(targetState = homeState) { state ->
+        when (state) {
+            is HomeState.Loading -> HomeSkeletonScreen(modifier = modifier)
+            is HomeState.CachedSuccess -> HomeScreen(
+                onSubjectClick = onSubjectClick,
+                innerPadding = innerPadding,
+                homeData = state.homeData,
+                isRefreshing = false,
+                onRefresh = { },
+                sortType = state.homeData.sortType,
+                onSortClick = { homeViewModel.showSortBottomSheet = true },
+                modifier = modifier
+            )
+            is HomeState.Success -> HomeScreen(
+                onSubjectClick = onSubjectClick,
+                innerPadding = innerPadding,
+                homeData = state.homeData,
+                isRefreshing = state.isRefreshing,
+                onRefresh = { homeViewModel.refresh() },
+                sortType = state.homeData.sortType,
+                onSortClick = { homeViewModel.showSortBottomSheet = true },
+                modifier = modifier
+            )
+            is HomeState.Error -> ErrorScreen(onClick = { homeViewModel.fetchData() })
+        }
     }
 }
 

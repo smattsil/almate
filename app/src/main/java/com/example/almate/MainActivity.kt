@@ -23,7 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.almate.features.auth.presentation.LoginScreen
-import com.example.almate.features.tools.presentation.components.MessageTextField
+import com.example.almate.features.tools.presentation.components.AlmateTextField
 import com.example.almate.presentation.ErrorScreen
 import com.example.almate.presentation.LoadingScreen
 import com.example.almate.presentation.theme.AlmateTheme

@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.almate.R
-import com.example.almate.features.tools.presentation.components.MessageTextField
+import com.example.almate.features.tools.presentation.components.AlmateTextField
 import com.example.almate.presentation.theme.proximaNovaFamily
 
 @Composable
@@ -110,9 +110,10 @@ fun ChatBottomAppBar(
             .background(Color.Red)
             .padding(horizontal = 16.dp, vertical = 24.dp)
     ) {
-        MessageTextField(
+        AlmateTextField(
             value = value,
             onValueChange = { onValueChange(it) },
+            singleLine = false,
             modifier = Modifier
                 .weight(1f)
         )

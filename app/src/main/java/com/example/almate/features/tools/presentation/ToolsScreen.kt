@@ -48,6 +48,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object GoalSetter
 @Serializable data object University
 @Serializable data object JobProspects
+@Serializable data object Celebrities
 
 enum class Tools(
     val icon: Int,
@@ -104,6 +105,13 @@ enum class Tools(
         route = JobProspects,
         enabled = false,
         description = "See how your strengths could shape your career."
+    ),
+    CELEBRITIES(
+    icon = R.drawable.taunt_24dp_e8eaed_fill0_wght400_grad0_opsz48,
+    label = "Celebrities",
+    route = Celebrities,
+    enabled = false,
+    description = "Find out which celebrities had the same grades as you!"
     )
 }
 

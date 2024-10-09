@@ -21,9 +21,10 @@ import com.example.almate.presentation.theme.cardBackgroundColor
 import com.example.almate.presentation.theme.proximaNovaFamily
 
 @Composable
-fun MessageTextField(
+fun AlmateTextField(
     value: String,
     onValueChange: (String) -> Unit,
+    singleLine: Boolean,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -44,6 +45,7 @@ fun MessageTextField(
             value = value,
             onValueChange = { onValueChange(it) },
             cursorBrush = SolidColor(Color.White.copy(alpha = 0.67f)),
+            singleLine = singleLine,
             textStyle = TextStyle.Default.copy(
                 fontFamily = proximaNovaFamily,
                 fontSize = 16.sp,
